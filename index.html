@@ -90,24 +90,41 @@ async function switchToBaseMainnet() {
                 });
             } catch (addError) {
                 console.error('Failed to add Base Mainnet:', addError);
+                alert('Failed to add Base Mainnet: ' + addError.message);
             }
         } else {
             console.error('Failed to switch network:', switchError);
+            alert('Failed to switch network: ' + switchError.message);
         }
     }
 }
 
 async function checkNetwork() {
-    const network = await provider.getNetwork();
-    console.log('Current network chainId:', network.chainId.toString());
-    if (network.chainId !== baseChainId) {
-        alert('Please switch to Base Mainnet in your wallet');
-        throw new Error('Wrong network');
+    try {
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId); // Convert to number for comparison
+        console.log('Current network chainId:', chainId, 'Expected:', baseChainId);
+        if (chainId !== baseChainId) {
+            console.error('Network mismatch. Current chainId:', chainId, 'Expected:', baseChainId);
+            await switchToBaseMainnet();
+            throw new Error('Please switch to Base Mainnet in your wallet');
+        }
+        return true;
+    } catch (error) {
+        console.error('Network check failed:', error);
+        throw error;
     }
 }
 
 async function connectWallet() {
-    if (window.ethereum) {
+    if (!window.ethereum) {
+        alert('MetaMask not detected');
+        totalSupplyEl.textContent = 'Please install MetaMask';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
+    try {
         provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         signer = await provider.getSigner();
@@ -119,11 +136,9 @@ async function connectWallet() {
         await switchToBaseMainnet();
         await checkNetwork();
         await updateInfo();
-    } else {
-        alert('MetaMask not detected');
-        totalSupplyEl.textContent = 'Please install MetaMask';
-        totalMintedEl.textContent = '';
-        yourMintedEl.textContent = '';
+    } catch (error) {
+        console.error('Wallet connection failed:', error);
+        alert('Wallet connection failed: ' + error.message);
     }
 }
 
@@ -142,6 +157,7 @@ async function updateInfo() {
     }
     const contract = new ethers.Contract(contractAddress, abi, provider);
     try {
+        totalSupplyEl.textContent = 'Fetching data...';
         await checkNetwork();
         const isPaused = await contract.paused();
         if (isPaused) {
@@ -174,25 +190,50 @@ async function updateInfo() {
         }
     } catch (err) {
         console.error('Error in updateInfo:', err);
-        totalSupplyEl.textContent = 'Error fetching data';
+        totalSupplyEl.textContent = 'Error fetching data: ' + err.message;
         totalMintedEl.textContent = '';
         yourMintedEl.textContent = '';
     }
 }
 
 async function mintNFT() {
-    if (!signer) return;
+    if (!signer) {
+        alert('Please connect wallet');
+        return;
+    }
     const contract = new ethers.Contract(contractAddress, abi, signer);
     try {
+        mintBtn.disabled = true;
+        mintBtn.textContent = 'Minting...';
         await checkNetwork();
+        const isPaused = await contract.paused();
+        if (isPaused) {
+            throw new Error('Contract is paused');
+        }
         const price = await contract.price();
+        console.log('Mint Price:', ethers.formatEther(price), 'ETH');
+        const balance = await provider.getBalance(userAddress);
+        console.log('Wallet Balance:', ethers.formatEther(balance), 'ETH');
+        if (balance < price) {
+            throw new Error('Insufficient funds for minting');
+        }
         const tx = await contract.mint({ value: price });
         console.log('Mint TX:', tx);
         await tx.wait();
+        alert('NFT minted successfully!');
         await updateInfo();
     } catch (err) {
         console.error('Mint error:', err);
-        alert('Minting failed: ' + err.message);
+        let errorMessage = 'Minting failed: ' + (err.reason || err.message || 'Unknown error');
+        if (err.code === 'INSUFFICIENT_FUNDS') {
+            errorMessage = 'Minting failed: Insufficient funds';
+        } else if (err.message.includes('Contract is paused')) {
+            errorMessage = 'Minting failed: Contract is paused';
+        }
+        alert(errorMessage);
+    } finally {
+        mintBtn.disabled = false;
+        mintBtn.textContent = 'Mint NFT';
     }
 }
 
