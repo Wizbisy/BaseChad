@@ -1,0 +1,15 @@
+// package.json (root)
+{
+  "name": "chad-nft-fullstack",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "install-all": "npm install && cd backend && npm install",
+    "dev": "cd backend && npm run dev",
+    "start": "cd backend && npm run start"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
