@@ -1,0 +1,21 @@
+// backend/package.json
+{
+  "name": "chad-nft-backend",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@reown/appkit": "^1.0.0",
+    "@reown/appkit-adapter-wagmi": "^1.0.0",
+    "@wagmi/core": "^2.13.4",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "viem": "^2.21.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
