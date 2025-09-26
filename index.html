@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,7 +14,7 @@
         }
 
         body {
-            background-color: #1e3a8a; /* Base blue background */
+            background-color: #1e3a8a;
             color: #ffffff;
             display: flex;
             flex-direction: column;
@@ -25,15 +26,15 @@
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            background-color: #1e40af; /* Slightly lighter blue for header */
+            background-color: #1e40af;
         }
 
         .logo {
-            cursor: pointer; /* Makes SVG clickable */
+            cursor: pointer;
         }
 
         .logo svg {
-            width: 120px; /* SVG logo size */
+            width: 120px;
             height: 50px;
         }
 
@@ -68,15 +69,18 @@
         .nft-image {
             width: 300px;
             height: 300px;
-            background-color: #3b82f6; /* Placeholder for image */
+            background-color: #3b82f6;
             margin-bottom: 20px;
             border-radius: 10px;
+            background-image: url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4');
+            background-size: cover;
+            background-position: center;
         }
 
         .nft-info {
             margin-bottom: 20px;
             font-size: 18px;
-            font-family: 'Courier New', Courier, monospace; /* Previous logo font */
+            font-family: 'Courier New', Courier, monospace;
             letter-spacing: 2px;
             text-transform: uppercase;
             background: linear-gradient(to right, #ffffff 50%, transparent 50%) 0 0 / 2px 2px;
@@ -90,7 +94,7 @@
             border-radius: 5px;
             color: #ffffff;
             font-size: 18px;
-            font-family: 'Courier New', Courier, monospace; /* Previous logo font */
+            font-family: 'Courier New', Courier, monospace;
             letter-spacing: 2px;
             text-transform: uppercase;
             cursor: pointer;
@@ -127,11 +131,100 @@
     <div class="separator"></div>
     <div class="body">
         <div class="nft-image"></div>
-        <div class="nft-info">Total NFTs: 10,000</div>
-        <div class="nft-info">NFTs Minted: 2,500</div>
-        <div class="nft-info">Your NFTs Minted: 0</div>
+        <div class="nft-info">Total NFTs: Loading...</div>
+        <div class="nft-info">NFTs Minted: Loading...</div>
+        <div class="nft-info">Your NFTs Minted: Loading...</div>
         <button class="action-button wallet-connect">Connect Wallet</button>
     </div>
-    <script type="module" src="main.js"></script>
+    <script type="module">
+        
+        const backendUrl = 'https://chad-nft-fullstack.vercel.app'; 
+
+        // UI elements
+        const walletHeader = document.querySelector('.wallet-connect-header');
+        const connectButton = document.querySelector('.action-button.wallet-connect');
+        const totalNftsInfo = document.querySelector('.nft-info:nth-of-type(1)');
+        const mintedNftsInfo = document.querySelector('.nft-info:nth-of-type(2)');
+        const yourMintedInfo = document.querySelector('.nft-info:nth-of-type(3)');
+
+        // Create mint button
+        const mintButton = document.createElement('button');
+        mintButton.className = 'action-button mint';
+        mintButton.textContent = 'Mint NFT';
+        mintButton.style.display = 'none';
+        connectButton.parentNode.insertBefore(mintButton, connectButton.nextSibling);
+
+        // Function to shorten address
+        function shortenAddress(addr) {
+            return addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
+        }
+
+        // Fetch contract data
+        async function updateInfo() {
+            try {
+                const account = await fetch(`${backendUrl}/account`).then(res => res.json());
+                const isConnected = account.isConnected;
+                const address = account.address;
+
+                if (isConnected) {
+                    walletHeader.textContent = shortenAddress(address);
+                    walletHeader.classList.add('connected');
+                    connectButton.style.display = 'none';
+                    mintButton.style.display = 'block';
+                } else {
+                    walletHeader.textContent = 'Connect Wallet';
+                    walletHeader.classList.remove('connected');
+                    connectButton.style.display = 'block';
+                    mintButton.style.display = 'none';
+                }
+
+                const data = await fetch(`${backendUrl}/contract-data${address ? `?address=${address}` : ''}`).then(res => res.json());
+                totalNftsInfo.textContent = `Total NFTs: ${data.maxSupply}`;
+                mintedNftsInfo.textContent = `NFTs Minted: ${data.totalMinted}`;
+                yourMintedInfo.textContent = `Your NFTs Minted: ${data.yourMinted}`;
+            } catch (err) {
+                console.error('Update info error:', err);
+            }
+        }
+
+        // Connect wallet
+        async function connectWallet() {
+            try {
+                await fetch(`${backendUrl}/connect`, { method: 'POST' });
+                await updateInfo();
+            } catch (err) {
+                console.error('Connect error:', err);
+            }
+        }
+
+        // Mint NFT
+        async function mintNFT() {
+            try {
+                const response = await fetch(`${backendUrl}/mint`, { method: 'POST' });
+                const { hash } = await response.json();
+                console.log('Transaction hash:', hash);
+                await updateInfo();
+            } catch (err) {
+                console.error('Mint error:', err);
+            }
+        }
+
+        // Event listeners
+        walletHeader.addEventListener('click', async () => {
+            const account = await fetch(`${backendUrl}/account`).then(res => res.json());
+            if (!account.isConnected) {
+                connectWallet();
+            } else {
+                await fetch(`${backendUrl}/disconnect`, { method: 'POST' });
+                await updateInfo();
+            }
+        });
+
+        connectButton.addEventListener('click', connectWallet);
+        mintButton.addEventListener('click', mintNFT);
+
+        // Initial update
+        updateInfo();
+    </script>
 </body>
 </html>
