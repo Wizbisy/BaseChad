@@ -49,11 +49,12 @@ body { background-color:#1e3a8a; color:#fff; display:flex; flex-direction:column
 
 <script type="module">
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
+import { abi } from './abi.js';
 
 // ===== CONFIG =====
 const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
-const abi = './abi.js';
 const maxPerWallet = 10n;
+const baseChainId = 8453; // Base Mainnet chain ID
 
 // ===== ELEMENTS =====
 const walletHeader = document.querySelector('.wallet-connect-header');
@@ -65,6 +66,15 @@ const yourMintedEl = document.getElementById('yourMinted');
 
 let provider, signer, userAddress;
 
+// ===== FUNCTIONS =====
+async function checkNetwork(){
+    const network = await provider.getNetwork();
+    if(network.chainId !== baseChainId){
+        alert('Please switch to Base Mainnet in your wallet');
+        throw new Error('Wrong network');
+    }
+}
+
 async function connectWallet(){
     if(window.ethereum){
         provider = new ethers.BrowserProvider(window.ethereum);
@@ -75,6 +85,7 @@ async function connectWallet(){
         walletHeader.classList.add('connected');
         connectBtn.style.display = 'none';
         mintBtn.style.display = 'block';
+        await checkNetwork();
         updateInfo();
     }else{
         alert('MetaMask not detected');
@@ -85,6 +96,7 @@ async function updateInfo(){
     if(!provider) return;
     const contract = new ethers.Contract(contractAddress, abi, provider);
     try{
+        await checkNetwork();
         const maxSupply = await contract.MAX_SUPPLY();
         const totalMinted = await contract.totalMinted();
         let yourMinted = 0n;
@@ -110,6 +122,7 @@ async function mintNFT(){
     if(!signer) return;
     const contract = new ethers.Contract(contractAddress, abi, signer);
     try{
+        await checkNetwork();
         const price = await contract.price();
         const tx = await contract.mint({ value: price });
         console.log('Mint TX:', tx);
@@ -124,7 +137,6 @@ async function mintNFT(){
 connectBtn.addEventListener('click', connectWallet);
 walletHeader.addEventListener('click', async ()=>{
     if(userAddress){
-        // Disconnect
         userAddress = null;
         signer = null;
         provider = null;
