@@ -1,299 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chad NFT Mint Page</title>
-    <style>
-        * { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
-        body { background-color:#1e3a8a; color:#fff; display:flex; flex-direction:column; min-height:100vh; }
-        .header { display:flex; justify-content:space-between; align-items:center; padding:20px; background-color:#1e40af; }
-        .logo { cursor:pointer; }
-        .logo svg { width:120px; height:50px; }
-        .wallet-connect-header { background-color:#2563eb; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:16px; }
-        .wallet-connect-header.connected::after { content:" (Connected)"; color:#22c55e; }
-        .separator { border-bottom:2px solid #fff; margin:0 20px; }
-        .body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; }
-        .nft-image { width:300px; height:300px; background-color:#3b82f6; margin-bottom:20px; border-radius:10px; background-image:url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4'); background-size:cover; background-position:center; }
-        .nft-info { margin-bottom:20px; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; background:linear-gradient(to right,#fff 50%,transparent 50%) 0 0/2px 2px; -webkit-text-fill-color:transparent; -webkit-background-clip:text; }
-        .action-button { padding:15px 30px; border:none; border-radius:5px; color:#fff; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:background-color 0.3s; }
-        .action-button.wallet-connect { background-color:#2563eb; }
-        .action-button.mint { background-color:#1d4ed8; }
-        .action-button:disabled { background-color:#555; cursor:not-allowed; }
-        .action-button:hover:not(:disabled) { filter:brightness(0.9); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chad NFT Mint Page</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background-color:#1e3a8a; color:#fff; display:flex; flex-direction:column; min-height:100vh; }
+.header { display:flex; justify-content:space-between; align-items:center; padding:20px; background-color:#1e40af; }
+.logo { cursor:pointer; }
+.logo svg { width:120px; height:50px; }
+.wallet-connect-header { background-color:#2563eb; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:16px; }
+.wallet-connect-header.connected::after { content:" (Connected)"; color:#22c55e; }
+.separator { border-bottom:2px solid #fff; margin:0 20px; }
+.body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; }
+.nft-image { width:300px; height:300px; background-color:#3b82f6; margin-bottom:20px; border-radius:10px; background-image:url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4'); background-size:cover; background-position:center; }
+.nft-info { margin-bottom:20px; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; background:linear-gradient(to right,#fff 50%,transparent 50%) 0 0/2px 2px; -webkit-text-fill-color:transparent; -webkit-background-clip:text; }
+.action-button { padding:15px 30px; border:none; border-radius:5px; color:#fff; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:background-color 0.3s; }
+.action-button.wallet-connect { background-color:#2563eb; }
+.action-button.mint { background-color:#1d4ed8; }
+.action-button:disabled { background-color:#555; cursor:not-allowed; }
+.action-button:hover:not(:disabled) { filter:brightness(0.9); }
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <pattern id="dots" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
-                        <rect x="0" y="0" width="1.5" height="1.5" fill="#ffffff" />
-                    </pattern>
-                </defs>
-                <text x="0" y="40" font-family="Courier New, Courier, monospace" font-size="40" fill="url(#dots)" text-transform="uppercase">Chad</text>
-            </svg>
-        </div>
-        <div class="wallet-connect-header">Connect Wallet</div>
+<div class="header">
+    <div class="logo">
+        <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dots" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="1.5" height="1.5" fill="#ffffff" />
+                </pattern>
+            </defs>
+            <text x="0" y="40" font-family="Courier New, Courier, monospace" font-size="40" fill="url(#dots)" text-transform="uppercase">Chad</text>
+        </svg>
     </div>
-    <div class="separator"></div>
-    <div class="body">
-        <div class="nft-image"></div>
-        <div class="nft-info" id="totalSupply">Total NFTs: Please connect wallet</div>
-        <div class="nft-info" id="totalMinted">NFTs Minted: </div>
-        <div class="nft-info" id="yourMinted">Your NFTs Minted: </div>
-        <button class="action-button wallet-connect" id="connectBtn">Connect Wallet</button>
-        <button class="action-button mint" id="mintBtn" style="display:none;">Mint NFT</button>
-    </div>
+    <div class="wallet-connect-header">Connect Wallet</div>
+</div>
+<div class="separator"></div>
+<div class="body">
+    <div class="nft-image"></div>
+    <div class="nft-info" id="totalSupply">Total NFTs: Please connect wallet</div>
+    <div class="nft-info" id="totalMinted">NFTs Minted: </div>
+    <div class="nft-info" id="yourMinted">Your NFTs Minted: </div>
+    <button class="action-button wallet-connect" id="connectBtn">Connect Wallet</button>
+    <button class="action-button mint" id="mintBtn" style="display:none;">Mint NFT</button>
+</div>
 
-    <script type="module">
-        import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
-        import { createWeb3Modal, defaultConfig } from 'https://unpkg.com/@web3modal/ethers@4.2.1/dist/index.js';
-        import { abi } from "./abi.js";
+<script type="module">
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
+import { abi } from "./abi.js";
 
-        // ===== CONFIG =====
-        const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
-        const maxPerWallet = 10n;
-        const baseChainId = 8453; // Base Mainnet chain ID
+// ===== CONFIG =====
+const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
+const maxPerWallet = 10n;
+const baseChainId = 8453; // Base Mainnet chain ID
 
-        // WalletConnect project ID (replace with your actual project ID)
-        const projectId = 'b39e54b774beba416b97f399ba3777e8'; // Replace with your WalletConnect project ID
+// ===== ELEMENTS =====
+const walletHeader = document.querySelector('.wallet-connect-header');
+const connectBtn = document.getElementById('connectBtn');
+const mintBtn = document.getElementById('mintBtn');
+const totalSupplyEl = document.getElementById('totalSupply');
+const totalMintedEl = document.getElementById('totalMinted');
+const yourMintedEl = document.getElementById('yourMinted');
 
-        // Web3Modal configuration
-        const metadata = {
-            name: 'Chad NFT',
-            description: 'Mint page for Chad NFT',
-            url: window.location.href,
-            icons: ['https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4']
-        };
+let provider, signer, userAddress;
 
-        const chains = [
-            {
-                chainId: baseChainId,
-                name: 'Base Mainnet',
-                currency: 'ETH',
-                explorerUrl: 'https://basescan.org',
-                rpcUrl: 'https://mainnet.base.org'
-            }
-        ];
-
-        const web3Modal = createWeb3Modal({
-            ethersConfig: defaultConfig({ metadata }),
-            chains,
-            projectId,
-            enableAnalytics: false,
-            themeMode: 'dark',
-            themeVariables: {
-                '--w3m-accent': '#2563eb',
-                '--w3m-border-radius-master': '5px'
-            }
+// ===== FUNCTIONS =====
+async function switchToBaseMainnet() {
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${baseChainId.toString(16)}` }],
         });
-
-        // ===== ELEMENTS =====
-        const walletHeader = document.querySelector('.wallet-connect-header');
-        const connectBtn = document.getElementById('connectBtn');
-        const mintBtn = document.getElementById('mintBtn');
-        const totalSupplyEl = document.getElementById('totalSupply');
-        const totalMintedEl = document.getElementById('totalMinted');
-        const yourMintedEl = document.getElementById('yourMinted');
-
-        let provider, signer, userAddress;
-
-        // ===== FUNCTIONS =====
-        async function switchToBaseMainnet() {
+    } catch (switchError) {
+        if (switchError.code === 4902) {
             try {
-                await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${baseChainId.toString(16)}` }]);
-            } catch (switchError) {
-                if (switchError.code === 4902) {
-                    try {
-                        await provider.send('wallet_addEthereumChain', [{
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                        {
                             chainId: `0x${baseChainId.toString(16)}`,
                             chainName: 'Base Mainnet',
                             rpcUrls: ['https://mainnet.base.org'],
                             nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                            blockExplorerUrls: ['https://basescan.org']
-                        }]);
-                    } catch (addError) {
-                        console.error('Failed to add Base Mainnet:', addError);
-                        alert('Failed to add Base Mainnet: ' + addError.message);
-                    }
-                } else {
-                    console.error('Failed to switch network:', switchError);
-                    alert('Failed to switch network: ' + switchError.message);
-                }
-            }
-        }
-
-        async function checkNetwork() {
-            try {
-                const network = await provider.getNetwork();
-                const chainId = Number(network.chainId);
-                console.log('Current network chainId:', chainId, 'Expected:', baseChainId);
-                if (chainId !== baseChainId) {
-                    await switchToBaseMainnet();
-                    throw new Error('Please switch to Base Mainnet in your wallet');
-                }
-                return true;
-            } catch (error) {
-                console.error('Network check failed:', error);
-                throw error;
-            }
-        }
-
-        async function connectWallet() {
-            try {
-                // Open Web3Modal to select wallet (MetaMask, WalletConnect, etc.)
-                const web3Provider = await web3Modal.open();
-                if (!web3Provider) {
-                    throw new Error('No provider returned from Web3Modal');
-                }
-                provider = new ethers.BrowserProvider(web3Provider);
-                signer = await provider.getSigner();
-                userAddress = await signer.getAddress();
-                walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-                walletHeader.classList.add('connected');
-                connectBtn.style.display = 'none';
-                mintBtn.style.display = 'block';
-                await checkNetwork();
-                await updateInfo();
-
-                // Subscribe to account and chain changes
-                web3Provider.on('accountsChanged', async (accounts) => {
-                    if (accounts.length === 0) {
-                        disconnectWallet();
-                    } else {
-                        userAddress = accounts[0];
-                        walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-                        await updateInfo();
-                    }
+                            blockExplorerUrls: ['https://basescan.org'],
+                        },
+                    ],
                 });
-                web3Provider.on('chainChanged', async () => {
-                    await checkNetwork();
-                    await updateInfo();
-                });
-            } catch (error) {
-                console.error('Wallet connection failed:', error);
-                alert('Wallet connection failed: ' + error.message);
-                totalSupplyEl.textContent = 'Please connect wallet';
-                totalMintedEl.textContent = '';
-                yourMintedEl.textContent = '';
+            } catch (addError) {
+                console.error('Failed to add Base Mainnet:', addError);
+                alert('Failed to add Base Mainnet: ' + addError.message);
             }
+        } else {
+            console.error('Failed to switch network:', switchError);
+            alert('Failed to switch network: ' + switchError.message);
         }
+    }
+}
 
-        function disconnectWallet() {
-            userAddress = null;
-            signer = null;
-            provider = null;
-            web3Modal.clearCachedProvider();
-            walletHeader.textContent = 'Connect Wallet';
-            walletHeader.classList.remove('connected');
-            connectBtn.style.display = 'block';
-            mintBtn.style.display = 'none';
-            totalSupplyEl.textContent = 'Please connect wallet';
+async function checkNetwork() {
+    try {
+        const network = await provider.getNetwork();
+        const chainId = Number(network.chainId); // Convert to number for comparison
+        console.log('Current network chainId:', chainId, 'Expected:', baseChainId);
+        if (chainId !== baseChainId) {
+            console.error('Network mismatch. Current chainId:', chainId, 'Expected:', baseChainId);
+            await switchToBaseMainnet();
+            throw new Error('Please switch to Base Mainnet in your wallet');
+        }
+        return true;
+    } catch (error) {
+        console.error('Network check failed:', error);
+        throw error;
+    }
+}
+
+async function connectWallet() {
+    if (!window.ethereum) {
+        alert('MetaMask not detected');
+        totalSupplyEl.textContent = 'Please install MetaMask';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
+    try {
+        provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+        walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+        walletHeader.classList.add('connected');
+        connectBtn.style.display = 'none';
+        mintBtn.style.display = 'block';
+        await switchToBaseMainnet();
+        await checkNetwork();
+        await updateInfo();
+    } catch (error) {
+        console.error('Wallet connection failed:', error);
+        alert('Wallet connection failed: ' + error.message);
+    }
+}
+
+async function updateInfo() {
+    if (!window.ethereum) {
+        totalSupplyEl.textContent = 'Please install MetaMask';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
+    if (!provider) {
+        totalSupplyEl.textContent = 'Please connect wallet';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
+    const contract = new ethers.Contract(contractAddress, abi, provider);
+    try {
+        totalSupplyEl.textContent = 'Fetching data...';
+        await checkNetwork();
+        const isPaused = await contract.paused();
+        if (isPaused) {
+            totalSupplyEl.textContent = 'Contract is paused';
             totalMintedEl.textContent = '';
             yourMintedEl.textContent = '';
+            mintBtn.disabled = true;
+            mintBtn.textContent = 'Minting Paused';
+            return;
         }
+        const maxSupply = await contract.MAX_SUPPLY();
+        const totalMinted = await contract.totalMinted();
+        let yourMinted = 0n;
+        if (userAddress) yourMinted = await contract.mintedPerWallet(userAddress);
 
-        async function updateInfo() {
-            if (!provider) {
-                totalSupplyEl.textContent = 'Please connect wallet';
-                totalMintedEl.textContent = '';
-                yourMintedEl.textContent = '';
-                return;
-            }
-            const contract = new ethers.Contract(contractAddress, abi, provider);
-            try {
-                totalSupplyEl.textContent = 'Fetching data...';
-                await checkNetwork();
-                const isPaused = await contract.paused();
-                if (isPaused) {
-                    totalSupplyEl.textContent = 'Contract is paused';
-                    totalMintedEl.textContent = '';
-                    yourMintedEl.textContent = '';
-                    mintBtn.disabled = true;
-                    mintBtn.textContent = 'Minting Paused';
-                    return;
-                }
-                const maxSupply = await contract.MAX_SUPPLY();
-                const totalMinted = await contract.totalMinted();
-                let yourMinted = 0n;
-                if (userAddress) yourMinted = await contract.mintedPerWallet(userAddress);
+        console.log('Max Supply:', maxSupply.toString());
+        console.log('Total Minted:', totalMinted.toString());
+        console.log('Your Minted:', yourMinted.toString());
 
-                console.log('Max Supply:', maxSupply.toString());
-                console.log('Total Minted:', totalMinted.toString());
-                console.log('Your Minted:', yourMinted.toString());
+        totalSupplyEl.textContent = `Total NFTs: ${maxSupply}`;
+        totalMintedEl.textContent = `NFTs Minted: ${totalMinted}`;
+        yourMintedEl.textContent = `Your NFTs Minted: ${yourMinted}`;
 
-                totalSupplyEl.textContent = `Total NFTs: ${maxSupply}`;
-                totalMintedEl.textContent = `NFTs Minted: ${totalMinted}`;
-                yourMintedEl.textContent = `Your NFTs Minted: ${yourMinted}`;
-
-                if (yourMinted >= maxPerWallet) {
-                    mintBtn.disabled = true;
-                    mintBtn.textContent = 'Max Minted';
-                } else {
-                    mintBtn.disabled = false;
-                    mintBtn.textContent = 'Mint NFT';
-                }
-            } catch (err) {
-                console.error('Error in updateInfo:', err);
-                totalSupplyEl.textContent = 'Error fetching data: ' + err.message;
-                totalMintedEl.textContent = '';
-                yourMintedEl.textContent = '';
-            }
+        if (yourMinted >= maxPerWallet) {
+            mintBtn.disabled = true;
+            mintBtn.textContent = 'Max Minted';
+        } else {
+            mintBtn.disabled = false;
+            mintBtn.textContent = 'Mint NFT';
         }
+    } catch (err) {
+        console.error('Error in updateInfo:', err);
+        totalSupplyEl.textContent = 'Error fetching data: ' + err.message;
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+    }
+}
 
-        async function mintNFT() {
-            if (!signer) {
-                alert('Please connect wallet');
-                return;
-            }
-            const contract = new ethers.Contract(contractAddress, abi, signer);
-            try {
-                mintBtn.disabled = true;
-                mintBtn.textContent = 'Minting...';
-                await checkNetwork();
-                const isPaused = await contract.paused();
-                if (isPaused) {
-                    throw new Error('Contract is paused');
-                }
-                const price = await contract.price();
-                console.log('Mint Price:', ethers.formatEther(price), 'ETH');
-                const balance = await provider.getBalance(userAddress);
-                console.log('Wallet Balance:', ethers.formatEther(balance), 'ETH');
-                if (balance < price) {
-                    throw new Error('Insufficient funds for minting');
-                }
-                const tx = await contract.mint({ value: price });
-                console.log('Mint TX:', tx);
-                await tx.wait();
-                alert('NFT minted successfully!');
-                await updateInfo();
-            } catch (err) {
-                console.error('Mint error:', err);
-                let errorMessage = 'Minting failed: ' + (err.reason || err.message || 'Unknown error');
-                if (err.code === 'INSUFFICIENT_FUNDS') {
-                    errorMessage = 'Minting failed: Insufficient funds';
-                } else if (err.message.includes('Contract is paused')) {
-                    errorMessage = 'Minting failed: Contract is paused';
-                }
-                alert(errorMessage);
-            } finally {
-                mintBtn.disabled = false;
-                mintBtn.textContent = 'Mint NFT';
-            }
+async function mintNFT() {
+    if (!signer) {
+        alert('Please connect wallet');
+        return;
+    }
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    try {
+        mintBtn.disabled = true;
+        mintBtn.textContent = 'Minting...';
+        await checkNetwork();
+        const isPaused = await contract.paused();
+        if (isPaused) {
+            throw new Error('Contract is paused');
         }
+        const price = await contract.price();
+        console.log('Mint Price:', ethers.formatEther(price), 'ETH');
+        const balance = await provider.getBalance(userAddress);
+        console.log('Wallet Balance:', ethers.formatEther(balance), 'ETH');
+        if (balance < price) {
+            throw new Error('Insufficient funds for minting');
+        }
+        const tx = await contract.mint({ value: price });
+        console.log('Mint TX:', tx);
+        await tx.wait();
+        alert('NFT minted successfully!');
+        await updateInfo();
+    } catch (err) {
+        console.error('Mint error:', err);
+        let errorMessage = 'Minting failed: ' + (err.reason || err.message || 'Unknown error');
+        if (err.code === 'INSUFFICIENT_FUNDS') {
+            errorMessage = 'Minting failed: Insufficient funds';
+        } else if (err.message.includes('Contract is paused')) {
+            errorMessage = 'Minting failed: Contract is paused';
+        }
+        alert(errorMessage);
+    } finally {
+        mintBtn.disabled = false;
+        mintBtn.textContent = 'Mint NFT';
+    }
+}
 
-        // ===== EVENTS =====
-        connectBtn.addEventListener('click', connectWallet);
-        walletHeader.addEventListener('click', async () => {
-            if (userAddress) {
-                disconnectWallet();
-            } else {
-                connectWallet();
-            }
-        });
-        mintBtn.addEventListener('click', mintNFT);
-    </script>
+// ===== EVENTS =====
+connectBtn.addEventListener('click', connectWallet);
+walletHeader.addEventListener('click', async () => {
+    if (userAddress) {
+        userAddress = null;
+        signer = null;
+        provider = null;
+        walletHeader.textContent = 'Connect Wallet';
+        walletHeader.classList.remove('connected');
+        connectBtn.style.display = 'block';
+        mintBtn.style.display = 'none';
+        totalSupplyEl.textContent = 'Please connect wallet';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+    } else {
+        connectWallet();
+    }
+});
+mintBtn.addEventListener('click', mintNFT);
+</script>
 </body>
 </html>
