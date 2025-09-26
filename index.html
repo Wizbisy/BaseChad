@@ -40,814 +40,19 @@ body { background-color:#1e3a8a; color:#fff; display:flex; flex-direction:column
 <div class="separator"></div>
 <div class="body">
     <div class="nft-image"></div>
-    <div class="nft-info" id="totalSupply">Total NFTs: Loading...</div>
-    <div class="nft-info" id="totalMinted">NFTs Minted: Loading...</div>
-    <div class="nft-info" id="yourMinted">Your NFTs Minted: Loading...</div>
+    <div class="nft-info" id="totalSupply">Total NFTs: Please connect wallet</div>
+    <div class="nft-info" id="totalMinted">NFTs Minted: </div>
+    <div class="nft-info" id="yourMinted">Your NFTs Minted: </div>
     <button class="action-button wallet-connect" id="connectBtn">Connect Wallet</button>
     <button class="action-button mint" id="mintBtn" style="display:none;">Mint NFT</button>
 </div>
 
 <script type="module">
 import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
+import { abi } from "./abi.js";
 
 // ===== CONFIG =====
 const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
-export const abi = [
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "initialBaseURI",
-				"type": "string"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "numerator",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "denominator",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC2981InvalidDefaultRoyalty",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC2981InvalidDefaultRoyaltyReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "numerator",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "denominator",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC2981InvalidTokenRoyalty",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC2981InvalidTokenRoyaltyReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "ERC721IncorrectOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC721InsufficientApproval",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "approver",
-				"type": "address"
-			}
-		],
-		"name": "ERC721InvalidApprover",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			}
-		],
-		"name": "ERC721InvalidOperator",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "ERC721InvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC721InvalidReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "ERC721InvalidSender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC721NonexistentToken",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "OwnableInvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "OwnableUnauthorizedAccount",
-		"type": "error"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "approved",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "bool",
-				"name": "approved",
-				"type": "bool"
-			}
-		],
-		"name": "ApprovalForAll",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "Paused",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "Unpaused",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "MAX_PER_WALLET",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "MAX_SUPPLY",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "getApproved",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			}
-		],
-		"name": "isApprovedForAll",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "mint",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"name": "mintedPerWallet",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			}
-		],
-		"name": "ownerMint",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "ownerOf",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "pause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "paused",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "price",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "salePrice",
-				"type": "uint256"
-			}
-		],
-		"name": "royaltyInfo",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "amount",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			},
-			{
-				"internalType": "bytes",
-				"name": "data",
-				"type": "bytes"
-			}
-		],
-		"name": "safeTransferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "operator",
-				"type": "address"
-			},
-			{
-				"internalType": "bool",
-				"name": "approved",
-				"type": "bool"
-			}
-		],
-		"name": "setApprovalForAll",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "string",
-				"name": "newBaseURI",
-				"type": "string"
-			}
-		],
-		"name": "setBaseURI",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "newPrice",
-				"type": "uint256"
-			}
-		],
-		"name": "setPrice",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "bytes4",
-				"name": "interfaceId",
-				"type": "bytes4"
-			}
-		],
-		"name": "supportsInterface",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "tokenURI",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalMinted",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "tokenId",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "unpause",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address payable",
-				"name": "to",
-				"type": "address"
-			}
-		],
-		"name": "withdraw",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	}
-];
 const maxPerWallet = 10n;
 const baseChainId = 8453; // Base Mainnet chain ID
 
@@ -862,76 +67,139 @@ const yourMintedEl = document.getElementById('yourMinted');
 let provider, signer, userAddress;
 
 // ===== FUNCTIONS =====
-async function checkNetwork(){
+async function switchToBaseMainnet() {
+    try {
+        await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: `0x${baseChainId.toString(16)}` }],
+        });
+    } catch (switchError) {
+        if (switchError.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_addEthereumChain',
+                    params: [
+                        {
+                            chainId: `0x${baseChainId.toString(16)}`,
+                            chainName: 'Base Mainnet',
+                            rpcUrls: ['https://mainnet.base.org'],
+                            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                            blockExplorerUrls: ['https://basescan.org'],
+                        },
+                    ],
+                });
+            } catch (addError) {
+                console.error('Failed to add Base Mainnet:', addError);
+            }
+        } else {
+            console.error('Failed to switch network:', switchError);
+        }
+    }
+}
+
+async function checkNetwork() {
     const network = await provider.getNetwork();
-    if(network.chainId !== baseChainId){
+    console.log('Current network chainId:', network.chainId.toString());
+    if (network.chainId !== baseChainId) {
         alert('Please switch to Base Mainnet in your wallet');
         throw new Error('Wrong network');
     }
 }
 
-async function connectWallet(){
-    if(window.ethereum){
+async function connectWallet() {
+    if (window.ethereum) {
         provider = new ethers.BrowserProvider(window.ethereum);
         await provider.send("eth_requestAccounts", []);
         signer = await provider.getSigner();
         userAddress = await signer.getAddress();
-        walletHeader.textContent = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+        walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
         walletHeader.classList.add('connected');
         connectBtn.style.display = 'none';
         mintBtn.style.display = 'block';
+        await switchToBaseMainnet();
         await checkNetwork();
-        updateInfo();
-    }else{
+        await updateInfo();
+    } else {
         alert('MetaMask not detected');
+        totalSupplyEl.textContent = 'Please install MetaMask';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
     }
 }
 
-async function updateInfo(){
-    if(!provider) return;
+async function updateInfo() {
+    if (!window.ethereum) {
+        totalSupplyEl.textContent = 'Please install MetaMask';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
+    if (!provider) {
+        totalSupplyEl.textContent = 'Please connect wallet';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+        return;
+    }
     const contract = new ethers.Contract(contractAddress, abi, provider);
-    try{
+    try {
         await checkNetwork();
+        const isPaused = await contract.paused();
+        if (isPaused) {
+            totalSupplyEl.textContent = 'Contract is paused';
+            totalMintedEl.textContent = '';
+            yourMintedEl.textContent = '';
+            mintBtn.disabled = true;
+            mintBtn.textContent = 'Minting Paused';
+            return;
+        }
         const maxSupply = await contract.MAX_SUPPLY();
         const totalMinted = await contract.totalMinted();
         let yourMinted = 0n;
-        if(userAddress) yourMinted = await contract.mintedPerWallet(userAddress);
+        if (userAddress) yourMinted = await contract.mintedPerWallet(userAddress);
+
+        console.log('Max Supply:', maxSupply.toString());
+        console.log('Total Minted:', totalMinted.toString());
+        console.log('Your Minted:', yourMinted.toString());
 
         totalSupplyEl.textContent = `Total NFTs: ${maxSupply}`;
         totalMintedEl.textContent = `NFTs Minted: ${totalMinted}`;
         yourMintedEl.textContent = `Your NFTs Minted: ${yourMinted}`;
 
-        if(yourMinted >= maxPerWallet){
+        if (yourMinted >= maxPerWallet) {
             mintBtn.disabled = true;
             mintBtn.textContent = 'Max Minted';
-        }else{
+        } else {
             mintBtn.disabled = false;
             mintBtn.textContent = 'Mint NFT';
         }
-    }catch(err){
-        console.error(err);
+    } catch (err) {
+        console.error('Error in updateInfo:', err);
+        totalSupplyEl.textContent = 'Error fetching data';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
     }
 }
 
-async function mintNFT(){
-    if(!signer) return;
+async function mintNFT() {
+    if (!signer) return;
     const contract = new ethers.Contract(contractAddress, abi, signer);
-    try{
+    try {
         await checkNetwork();
         const price = await contract.price();
         const tx = await contract.mint({ value: price });
         console.log('Mint TX:', tx);
         await tx.wait();
-        updateInfo();
-    }catch(err){
+        await updateInfo();
+    } catch (err) {
         console.error('Mint error:', err);
+        alert('Minting failed: ' + err.message);
     }
 }
 
 // ===== EVENTS =====
 connectBtn.addEventListener('click', connectWallet);
-walletHeader.addEventListener('click', async ()=>{
-    if(userAddress){
+walletHeader.addEventListener('click', async () => {
+    if (userAddress) {
         userAddress = null;
         signer = null;
         provider = null;
@@ -939,14 +207,14 @@ walletHeader.addEventListener('click', async ()=>{
         walletHeader.classList.remove('connected');
         connectBtn.style.display = 'block';
         mintBtn.style.display = 'none';
-    }else{
+        totalSupplyEl.textContent = 'Please connect wallet';
+        totalMintedEl.textContent = '';
+        yourMintedEl.textContent = '';
+    } else {
         connectWallet();
     }
 });
 mintBtn.addEventListener('click', mintNFT);
-
-// ===== INITIAL =====
-updateInfo();
 </script>
 </body>
 </html>
