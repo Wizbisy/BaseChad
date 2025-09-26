@@ -2,6 +2,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import cors from 'cors';
 import { createAppKit } from '@reown/appkit';
 import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
 import { base } from '@reown/appkit/networks';
@@ -16,6 +17,11 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = process.env.PORT || 3000;
+
+// Restrict CORS to only allow requests from base-chads.vercel.app
+app.use(cors({
+  origin: 'https://base-chads.vercel.app'
+}));
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..'))); // Serve index.html from root
