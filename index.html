@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chad NFT Mint Page</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+body { background-color:#1e3a8a; color:#fff; display:flex; flex-direction:column; min-height:100vh; }
+.header { display:flex; justify-content:space-between; align-items:center; padding:20px; background-color:#1e40af; }
+.logo { cursor:pointer; }
+.logo svg { width:120px; height:50px; }
+.wallet-connect-header { background-color:#2563eb; padding:10px 20px; border-radius:5px; cursor:pointer; font-size:16px; }
+.wallet-connect-header.connected::after { content:" (Connected)"; color:#22c55e; }
+.separator { border-bottom:2px solid #fff; margin:0 20px; }
+.body { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; text-align:center; }
+.nft-image { width:300px; height:300px; background-color:#3b82f6; margin-bottom:20px; border-radius:10px; background-image:url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4'); background-size:cover; background-position:center; }
+.nft-info { margin-bottom:20px; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; background:linear-gradient(to right,#fff 50%,transparent 50%) 0 0/2px 2px; -webkit-text-fill-color:transparent; -webkit-background-clip:text; }
+.action-button { padding:15px 30px; border:none; border-radius:5px; color:#fff; font-size:18px; font-family:'Courier New', Courier, monospace; letter-spacing:2px; text-transform:uppercase; cursor:pointer; transition:background-color 0.3s; }
+.action-button.wallet-connect { background-color:#2563eb; }
+.action-button.mint { background-color:#1d4ed8; }
+.action-button:disabled { background-color:#555; cursor:not-allowed; }
+.action-button:hover:not(:disabled) { filter:brightness(0.9); }
+</style>
+</head>
+<body>
+<div class="header">
+    <div class="logo">
+        <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dots" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="1.5" height="1.5" fill="#ffffff" />
+                </pattern>
+            </defs>
+            <text x="0" y="40" font-family="Courier New, Courier, monospace" font-size="40" fill="url(#dots)" text-transform="uppercase">Chad</text>
+        </svg>
+    </div>
+    <div class="wallet-connect-header">Connect Wallet</div>
+</div>
+<div class="separator"></div>
+<div class="body">
+    <div class="nft-image"></div>
+    <div class="nft-info" id="totalSupply">Total NFTs: Loading...</div>
+    <div class="nft-info" id="totalMinted">NFTs Minted: Loading...</div>
+    <div class="nft-info" id="yourMinted">Your NFTs Minted: Loading...</div>
+    <button class="action-button wallet-connect" id="connectBtn">Connect Wallet</button>
+    <button class="action-button mint" id="mintBtn" style="display:none;">Mint NFT</button>
+</div>
+
+<script type="module">
+import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
+
+// ===== CONFIG =====
+const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
+const abi = './abi.js';
+const maxPerWallet = 10n;
+
+// ===== ELEMENTS =====
+const walletHeader = document.querySelector('.wallet-connect-header');
+const connectBtn = document.getElementById('connectBtn');
+const mintBtn = document.getElementById('mintBtn');
+const totalSupplyEl = document.getElementById('totalSupply');
+const totalMintedEl = document.getElementById('totalMinted');
+const yourMintedEl = document.getElementById('yourMinted');
+
+let provider, signer, userAddress;
+
+async function connectWallet(){
+    if(window.ethereum){
+        provider = new ethers.BrowserProvider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+        walletHeader.textContent = `${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+        walletHeader.classList.add('connected');
+        connectBtn.style.display = 'none';
+        mintBtn.style.display = 'block';
+        updateInfo();
+    }else{
+        alert('MetaMask not detected');
+    }
+}
+
+async function updateInfo(){
+    if(!provider) return;
+    const contract = new ethers.Contract(contractAddress, abi, provider);
+    try{
+        const maxSupply = await contract.MAX_SUPPLY();
+        const totalMinted = await contract.totalMinted();
+        let yourMinted = 0n;
+        if(userAddress) yourMinted = await contract.mintedPerWallet(userAddress);
+
+        totalSupplyEl.textContent = `Total NFTs: ${maxSupply}`;
+        totalMintedEl.textContent = `NFTs Minted: ${totalMinted}`;
+        yourMintedEl.textContent = `Your NFTs Minted: ${yourMinted}`;
+
+        if(yourMinted >= maxPerWallet){
+            mintBtn.disabled = true;
+            mintBtn.textContent = 'Max Minted';
+        }else{
+            mintBtn.disabled = false;
+            mintBtn.textContent = 'Mint NFT';
+        }
+    }catch(err){
+        console.error(err);
+    }
+}
+
+async function mintNFT(){
+    if(!signer) return;
+    const contract = new ethers.Contract(contractAddress, abi, signer);
+    try{
+        const price = await contract.price();
+        const tx = await contract.mint({ value: price });
+        console.log('Mint TX:', tx);
+        await tx.wait();
+        updateInfo();
+    }catch(err){
+        console.error('Mint error:', err);
+    }
+}
+
+// ===== EVENTS =====
+connectBtn.addEventListener('click', connectWallet);
+walletHeader.addEventListener('click', async ()=>{
+    if(userAddress){
+        // Disconnect
+        userAddress = null;
+        signer = null;
+        provider = null;
+        walletHeader.textContent = 'Connect Wallet';
+        walletHeader.classList.remove('connected');
+        connectBtn.style.display = 'block';
+        mintBtn.style.display = 'none';
+    }else{
+        connectWallet();
+    }
+});
+mintBtn.addEventListener('click', mintNFT);
+
+// ===== INITIAL =====
+updateInfo();
+</script>
+</body>
+</html>
