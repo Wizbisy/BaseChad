@@ -1,230 +1,210 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chad NFT Mint Page</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: Arial, sans-serif;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chad NFT Mint Page</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
 
-        body {
-            background-color: #1e3a8a;
-            color: #ffffff;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+body {
+    background-color: #1e3a8a;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            background-color: #1e40af;
-        }
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #1e40af;
+}
 
-        .logo {
-            cursor: pointer;
-        }
+.logo {
+    cursor: pointer;
+}
 
-        .logo svg {
-            width: 120px;
-            height: 50px;
-        }
+.logo svg {
+    width: 120px;
+    height: 50px;
+}
 
-        .wallet-connect-header {
-            background-color: #2563eb;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-        }
+.wallet-connect-header {
+    background-color: #2563eb;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
 
-        .wallet-connect-header.connected::after {
-            content: " (Connected)";
-            color: #22c55e;
-        }
+.wallet-connect-header.connected::after {
+    content: " (Connected)";
+    color: #22c55e;
+}
 
-        .separator {
-            border-bottom: 2px solid #ffffff;
-            margin: 0 20px;
-        }
+.separator {
+    border-bottom: 2px solid #ffffff;
+    margin: 0 20px;
+}
 
-        .body {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
+.body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    text-align: center;
+}
 
-        .nft-image {
-            width: 300px;
-            height: 300px;
-            background-color: #3b82f6;
-            margin-bottom: 20px;
-            border-radius: 10px;
-            background-image: url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4');
-            background-size: cover;
-            background-position: center;
-        }
+.nft-image {
+    width: 300px;
+    height: 300px;
+    background-color: #3b82f6;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    background-image: url('https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4');
+    background-size: cover;
+    background-position: center;
+}
 
-        .nft-info {
-            margin-bottom: 20px;
-            font-size: 18px;
-            font-family: 'Courier New', Courier, monospace;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            background: linear-gradient(to right, #ffffff 50%, transparent 50%) 0 0 / 2px 2px;
-            -webkit-text-fill-color: transparent;
-            -webkit-background-clip: text;
-        }
+.nft-info {
+    margin-bottom: 20px;
+    font-size: 18px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    background: linear-gradient(to right, #ffffff 50%, transparent 50%) 0 0 / 2px 2px;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+}
 
-        .action-button {
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            color: #ffffff;
-            font-size: 18px;
-            font-family: 'Courier New', Courier, monospace;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+.action-button {
+    padding: 15px 30px;
+    border: none;
+    border-radius: 5px;
+    color: #ffffff;
+    font-size: 18px;
+    font-family: 'Courier New', Courier, monospace;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
 
-        .action-button.wallet-connect {
-            background-color: #2563eb;
-        }
+.action-button.wallet-connect {
+    background-color: #2563eb;
+}
 
-        .action-button.mint {
-            background-color: #1d4ed8;
-        }
+.action-button.mint {
+    background-color: #1d4ed8;
+}
 
-        .action-button:hover {
-            filter: brightness(0.9);
-        }
-    </style>
+.action-button:hover {
+    filter: brightness(0.9);
+}
+</style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">
-            <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <pattern id="dots" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
-                        <rect x="0" y="0" width="1.5" height="1.5" fill="#ffffff" />
-                    </pattern>
-                </defs>
-                <text x="0" y="40" font-family="Courier New, Courier, monospace" font-size="40" fill="url(#dots)" text-transform="uppercase">Chad</text>
-            </svg>
-        </div>
-        <div class="wallet-connect-header">Connect Wallet</div>
+<div class="header">
+    <div class="logo">
+        <svg viewBox="0 0 120 50" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <pattern id="dots" x="0" y="0" width="3" height="3" patternUnits="userSpaceOnUse">
+                    <rect x="0" y="0" width="1.5" height="1.5" fill="#ffffff" />
+                </pattern>
+            </defs>
+            <text x="0" y="40" font-family="Courier New, Courier, monospace" font-size="40" fill="url(#dots)" text-transform="uppercase">Chad</text>
+        </svg>
     </div>
-    <div class="separator"></div>
-    <div class="body">
-        <div class="nft-image"></div>
-        <div class="nft-info">Total NFTs: Loading...</div>
-        <div class="nft-info">NFTs Minted: Loading...</div>
-        <div class="nft-info">Your NFTs Minted: Loading...</div>
-        <button class="action-button wallet-connect">Connect Wallet</button>
-    </div>
-    <script type="module">
-        // Set to backend URL after deployment
-        const backendUrl = 'https://hchad-nft-fullstack.vercel.app'; // Update post-deployment
+    <div class="wallet-connect-header">Connect Wallet</div>
+</div>
+<div class="separator"></div>
+<div class="body">
+    <div class="nft-image"></div>
+    <div class="nft-info">Total NFTs: Loading...</div>
+    <div class="nft-info">NFTs Minted: Loading...</div>
+    <div class="nft-info">Your NFTs Minted: Loading...</div>
+    <button class="action-button wallet-connect">Connect Wallet</button>
+</div>
 
-        // UI elements
-        const walletHeader = document.querySelector('.wallet-connect-header');
-        const connectButton = document.querySelector('.action-button.wallet-connect');
-        const totalNftsInfo = document.querySelector('.nft-info:nth-of-type(1)');
-        const mintedNftsInfo = document.querySelector('.nft-info:nth-of-type(2)');
-        const yourMintedInfo = document.querySelector('.nft-info:nth-of-type(3)');
+<script type="module">
+const backendUrl = 'https://hchad-nft-fullstack.vercel.app';
 
-        // Create mint button
-        const mintButton = document.createElement('button');
-        mintButton.className = 'action-button mint';
-        mintButton.textContent = 'Mint NFT';
-        mintButton.style.display = 'none';
-        connectButton.parentNode.insertBefore(mintButton, connectButton.nextSibling);
+const walletHeader = document.querySelector('.wallet-connect-header');
+const connectButton = document.querySelector('.action-button.wallet-connect');
+const totalNftsInfo = document.querySelector('.nft-info:nth-of-type(1)');
+const mintedNftsInfo = document.querySelector('.nft-info:nth-of-type(2)');
+const yourMintedInfo = document.querySelector('.nft-info:nth-of-type(3)');
 
-        // Function to shorten address
-        function shortenAddress(addr) {
-            return addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : '';
+const mintButton = document.createElement('button');
+mintButton.className = 'action-button mint';
+mintButton.textContent = 'Mint NFT';
+mintButton.style.display = 'none';
+connectButton.parentNode.insertBefore(mintButton, connectButton.nextSibling);
+
+function shortenAddress(addr) {
+    return addr ? `${addr.slice(0,6)}...${addr.slice(-4)}` : '';
+}
+
+async function updateInfo() {
+    try {
+        const account = await fetch(`${backendUrl}/account`, { credentials: 'include' }).then(res => res.json());
+        const isConnected = account.isConnected;
+        const address = account.address;
+
+        if (isConnected) {
+            walletHeader.textContent = shortenAddress(address);
+            walletHeader.classList.add('connected');
+            connectButton.style.display = 'none';
+            mintButton.style.display = 'block';
+        } else {
+            walletHeader.textContent = 'Connect Wallet';
+            walletHeader.classList.remove('connected');
+            connectButton.style.display = 'block';
+            mintButton.style.display = 'none';
         }
 
-        // Fetch contract data
-        async function updateInfo() {
-            try {
-                const account = await fetch(`${backendUrl}/account`).then(res => res.json());
-                const isConnected = account.isConnected;
-                const address = account.address;
+        const data = await fetch(`${backendUrl}/contract-data${address ? `?address=${address}` : ''}`, { credentials: 'include' }).then(res => res.json());
+        totalNftsInfo.textContent = `Total NFTs: ${data.maxSupply}`;
+        mintedNftsInfo.textContent = `NFTs Minted: ${data.totalMinted}`;
+        yourMintedInfo.textContent = `Your NFTs Minted: ${data.yourMinted}`;
+    } catch (err) {
+        console.error('Update info error:', err);
+        totalNftsInfo.textContent = 'Error loading data';
+        mintedNftsInfo.textContent = '';
+        yourMintedInfo.textContent = '';
+    }
+}
 
-                if (isConnected) {
-                    walletHeader.textContent = shortenAddress(address);
-                    walletHeader.classList.add('connected');
-                    connectButton.style.display = 'none';
-                    mintButton.style.display = 'block';
-                } else {
-                    walletHeader.textContent = 'Connect Wallet';
-                    walletHeader.classList.remove('connected');
-                    connectButton.style.display = 'block';
-                    mintButton.style.display = 'none';
-                }
+async function connectWallet() {
+    await updateInfo();
+}
 
-                const data = await fetch(`${backendUrl}/contract-data${address ? `?address=${address}` : ''}`).then(res => res.json());
-                totalNftsInfo.textContent = `Total NFTs: ${data.maxSupply}`;
-                mintedNftsInfo.textContent = `NFTs Minted: ${data.totalMinted}`;
-                yourMintedInfo.textContent = `Your NFTs Minted: ${data.yourMinted}`;
-            } catch (err) {
-                console.error('Update info error:', err);
-            }
-        }
+async function mintNFT() {
+    try {
+        const response = await fetch(`${backendUrl}/mint`, { method: 'POST', credentials: 'include' });
+        const { hash } = await response.json();
+        console.log('Transaction hash:', hash);
+        await updateInfo();
+    } catch (err) {
+        console.error('Mint error:', err);
+    }
+}
 
-        // Connect wallet
-        async function connectWallet() {
-            try {
-                await fetch(`${backendUrl}/connect`, { method: 'POST' });
-                await updateInfo();
-            } catch (err) {
-                console.error('Connect error:', err);
-            }
-        }
+walletHeader.addEventListener('click', connectWallet);
+connectButton.addEventListener('click', connectWallet);
+mintButton.addEventListener('click', mintNFT);
 
-        // Mint NFT
-        async function mintNFT() {
-            try {
-                const response = await fetch(`${backendUrl}/mint`, { method: 'POST' });
-                const { hash } = await response.json();
-                console.log('Transaction hash:', hash);
-                await updateInfo();
-            } catch (err) {
-                console.error('Mint error:', err);
-            }
-        }
-
-        // Event listeners
-        walletHeader.addEventListener('click', async () => {
-            const account = await fetch(`${backendUrl}/account`).then(res => res.json());
-            if (!account.isConnected) {
-                connectWallet();
-            } else {
-                await fetch(`${backendUrl}/disconnect`, { method: 'POST' });
-                await updateInfo();
-            }
-        });
-
-        connectButton.addEventListener('click', connectWallet);
-        mintButton.addEventListener('click', mintNFT);
-
-        // Initial update
-        updateInfo();
-    </script>
+updateInfo();
+</script>
 </body>
 </html>
