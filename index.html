@@ -44,22 +44,25 @@
         <div class="nft-info" id="totalMinted">NFTs Minted: </div>
         <div class="nft-info" id="yourMinted">Your NFTs Minted: </div>
         <button class="action-button wallet-connect" id="connectBtn">Connect Wallet</button>
+        <appkit-button></appkit-button> <!-- Web component for reliable Reown modal trigger -->
         <button class="action-button mint" id="mintBtn" style="display:none;">Mint NFT</button>
     </div>
 
     <script type="module">
         import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
-        import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.20/dist/index.js";
-        import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.7.15/dist/index.js";
+        import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.18/dist/index.js";
+        import { WagmiAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-wagmi@1.7.17/dist/index.js";
         import { base } from "https://cdn.jsdelivr.net/npm/@reown/appkit/networks@0.0.0/dist/index.js";
+        import * as wagmi from "https://cdn.jsdelivr.net/npm/wagmi@2.16.1/dist/index.js";
+        import * as viem from "https://cdn.jsdelivr.net/npm/viem@2.33.2/dist/index.js";
         import { abi } from "./abi.js";
 
         // ===== CONFIG =====
         const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
         const maxPerWallet = 10n;
-        const baseChainId = 8453;
+        const baseChainId = 8453; // Base Mainnet chain ID
 
-        const projectId = 'b39e54b774beba416b97f399ba3777e8';
+        const projectId = 'b39e54b774beba416b97f399ba3777e8'; // Your provided project ID
 
         const metadata = {
             name: 'Chad NFT',
@@ -70,10 +73,13 @@
 
         const networks = [base];
 
-        const adapter = new EthersAdapter();
+        const wagmiAdapter = new WagmiAdapter({
+            projectId,
+            networks
+        });
 
         const modal = createAppKit({
-            adapters: [adapter],
+            adapters: [wagmiAdapter],
             networks,
             metadata,
             projectId,
@@ -99,7 +105,7 @@
 
         // Subscribe to state changes for connection handling
         modal.subscribeState((state) => {
-            console.log('AppKit state changed:', state); // Debug log to see if subscription fires
+            console.log('AppKit state changed:', state); // Debug to check subscription
             if (state.isConnected) {
                 const walletProvider = modal.getWalletProvider();
                 if (walletProvider) {
@@ -149,7 +155,7 @@
 
         async function connectWallet() {
             try {
-                console.log('Opening modal...'); // Debug log to confirm button click
+                console.log('Opening modal...'); // Debug log
                 await modal.open();
             } catch (error) {
                 console.error('Wallet connection failed:', error);
