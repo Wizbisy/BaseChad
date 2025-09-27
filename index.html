@@ -49,7 +49,9 @@
 
     <script type="module">
         import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
-        import { createWeb3Modal, defaultConfig } from 'https://unpkg.com/@web3modal/ethers@4.2.1/dist/index.js';
+        import { createAppKit } from "https://unpkg.com/@reown/appkit?module";
+        import { WagmiAdapter } from "https://unpkg.com/@reown/appkit-adapter-wagmi?module";
+        import { base } from "https://unpkg.com/@reown/appkit/networks?module";
         import { abi } from "./abi.js";
 
         // ===== CONFIG =====
@@ -57,10 +59,8 @@
         const maxPerWallet = 10n;
         const baseChainId = 8453; // Base Mainnet chain ID
 
-        // WalletConnect project ID (replace with your actual project ID)
-        const projectId = 'b39e54b774beba416b97f399ba3777e8'; // Replace with your WalletConnect project ID
+        const projectId = 'b39e54b774beba416b97f399ba3777e8'; // Your provided project ID
 
-        // Web3Modal configuration
         const metadata = {
             name: 'Chad NFT',
             description: 'Mint page for Chad NFT',
@@ -68,21 +68,21 @@
             icons: ['https://ipfs.io/ipfs/bafkreif3in6wmhvrcfi26fvojixolla4yhvegltbwvean4sldjju72obo4']
         };
 
-        const chains = [
-            {
-                chainId: baseChainId,
-                name: 'Base Mainnet',
-                currency: 'ETH',
-                explorerUrl: 'https://basescan.org',
-                rpcUrl: 'https://mainnet.base.org'
-            }
-        ];
+        const networks = [base];
 
-        const web3Modal = createWeb3Modal({
-            ethersConfig: defaultConfig({ metadata }),
-            chains,
+        const wagmiAdapter = new WagmiAdapter({
             projectId,
-            enableAnalytics: false,
+            networks
+        });
+
+        const modal = createAppKit({
+            adapters: [wagmiAdapter],
+            networks,
+            metadata,
+            projectId,
+            features: {
+                analytics: false
+            },
             themeMode: 'dark',
             themeVariables: {
                 '--w3m-accent': '#2563eb',
@@ -100,20 +100,25 @@
 
         let provider, signer, userAddress;
 
-        // Subscribe to provider changes (handles connect, disconnect, account change, chain change)
-        web3Modal.subscribeProvider(async (data) => {
-            if (data.provider) {
-                provider = new ethers.BrowserProvider(data.provider);
-                signer = await provider.getSigner();
-                userAddress = await signer.getAddress();
-                walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-                walletHeader.classList.add('connected');
-                connectBtn.style.display = 'none';
-                mintBtn.style.display = 'block';
-                await checkNetwork();
-                await updateInfo();
-
-                // Optional: Add raw provider listeners if needed, but subscribeProvider should handle most cases
+        // Subscribe to state changes for connection handling
+        modal.subscribeState((state) => {
+            if (state.isConnected) {
+                const walletProvider = modal.getWalletProvider();
+                if (walletProvider) {
+                    provider = new ethers.BrowserProvider(walletProvider);
+                    provider.getSigner().then((s) => {
+                        signer = s;
+                        signer.getAddress().then((addr) => {
+                            userAddress = addr;
+                            walletHeader.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+                            walletHeader.classList.add('connected');
+                            connectBtn.style.display = 'none';
+                            mintBtn.style.display = 'block';
+                            checkNetwork();
+                            updateInfo();
+                        });
+                    }).catch(err => console.error('Signer error:', err));
+                }
             } else {
                 disconnectWallet();
             }
@@ -122,32 +127,16 @@
         // ===== FUNCTIONS =====
         async function switchToBaseMainnet() {
             try {
-                await provider.send('wallet_switchEthereumChain', [{ chainId: `0x${baseChainId.toString(16)}` }]);
+                await modal.switchNetwork(base);
             } catch (switchError) {
-                if (switchError.code === 4902) {
-                    try {
-                        await provider.send('wallet_addEthereumChain', [{
-                            chainId: `0x${baseChainId.toString(16)}`,
-                            chainName: 'Base Mainnet',
-                            rpcUrls: ['https://mainnet.base.org'],
-                            nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
-                            blockExplorerUrls: ['https://basescan.org']
-                        }]);
-                    } catch (addError) {
-                        console.error('Failed to add Base Mainnet:', addError);
-                        alert('Failed to add Base Mainnet: ' + addError.message);
-                    }
-                } else {
-                    console.error('Failed to switch network:', switchError);
-                    alert('Failed to switch network: ' + switchError.message);
-                }
+                console.error('Failed to switch network:', switchError);
+                alert('Failed to switch network: ' + switchError.message);
             }
         }
 
         async function checkNetwork() {
             try {
-                const network = await provider.getNetwork();
-                const chainId = Number(network.chainId);
+                const chainId = await modal.getChainId();
                 console.log('Current network chainId:', chainId, 'Expected:', baseChainId);
                 if (chainId !== baseChainId) {
                     await switchToBaseMainnet();
@@ -162,7 +151,7 @@
 
         async function connectWallet() {
             try {
-                web3Modal.open();
+                await modal.open();
             } catch (error) {
                 console.error('Wallet connection failed:', error);
                 alert('Wallet connection failed: ' + error.message);
@@ -176,7 +165,7 @@
             userAddress = null;
             signer = null;
             provider = null;
-            web3Modal.clearCachedProvider();
+            modal.disconnect();
             walletHeader.textContent = 'Connect Wallet';
             walletHeader.classList.remove('connected');
             connectBtn.style.display = 'block';
@@ -285,6 +274,14 @@
             }
         });
         mintBtn.addEventListener('click', mintNFT);
+
+        // Optional: Subscribe to events for chain/account changes
+        modal.subscribeEvents((event) => {
+            if (event.data.event === 'CHAIN_CHANGED' || event.data.event === 'ACCOUNT_CHANGED') {
+                checkNetwork();
+                updateInfo();
+            }
+        });
     </script>
 </body>
 </html>
