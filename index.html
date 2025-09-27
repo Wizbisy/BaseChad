@@ -49,9 +49,9 @@
 
     <script type="module">
         import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
-        import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.8.6/+esm";
-        import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.8.7/+esm";
-        import { base } from "https://cdn.jsdelivr.net/npm/@reown/appkit/networks@1.0.0/+esm";
+        import { createAppKit } from "https://unpkg.com/@reown/appkit@1.8.7?module";
+        import { EthersAdapter } from "https://unpkg.com/@reown/appkit-adapter-ethers@1.8.7?module";
+        import { base } from "https://unpkg.com/@reown/appkit/networks@1.8.7?module";
         import { abi } from "./abi.js";
 
         // ===== CONFIG =====
@@ -101,6 +101,7 @@
 
         // Subscribe to state changes for connection handling
         modal.subscribeState((state) => {
+            console.log('State change:', state); // Debug to see if subscription works
             if (state.isConnected) {
                 const walletProvider = modal.getWalletProvider();
                 if (walletProvider) {
@@ -150,6 +151,7 @@
 
         async function connectWallet() {
             try {
+                console.log('Attempting to open modal...'); // Debug
                 await modal.open();
             } catch (error) {
                 console.error('Wallet connection failed:', error);
