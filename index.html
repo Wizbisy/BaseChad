@@ -49,17 +49,17 @@
 
     <script type="module">
         import { ethers } from "https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js";
-        import { createAppKit } from "https://unpkg.com/@reown/appkit?module";
-        import { WagmiAdapter } from "https://unpkg.com/@reown/appkit-adapter-wagmi?module";
-        import { base } from "https://unpkg.com/@reown/appkit/networks?module";
+        import { createAppKit } from "https://cdn.jsdelivr.net/npm/@reown/appkit@1.7.20/dist/index.js";
+        import { EthersAdapter } from "https://cdn.jsdelivr.net/npm/@reown/appkit-adapter-ethers@1.7.15/dist/index.js";
+        import { base } from "https://cdn.jsdelivr.net/npm/@reown/appkit/networks@0.0.0/dist/index.js";
         import { abi } from "./abi.js";
 
         // ===== CONFIG =====
         const contractAddress = '0x33865EB37644bBCDb106b5f572FF4C4bE2B2B3DF';
         const maxPerWallet = 10n;
-        const baseChainId = 8453; // Base Mainnet chain ID
+        const baseChainId = 8453;
 
-        const projectId = 'b39e54b774beba416b97f399ba3777e8'; // Your provided project ID
+        const projectId = 'b39e54b774beba416b97f399ba3777e8';
 
         const metadata = {
             name: 'Chad NFT',
@@ -70,13 +70,10 @@
 
         const networks = [base];
 
-        const wagmiAdapter = new WagmiAdapter({
-            projectId,
-            networks
-        });
+        const adapter = new EthersAdapter();
 
         const modal = createAppKit({
-            adapters: [wagmiAdapter],
+            adapters: [adapter],
             networks,
             metadata,
             projectId,
@@ -102,6 +99,7 @@
 
         // Subscribe to state changes for connection handling
         modal.subscribeState((state) => {
+            console.log('AppKit state changed:', state); // Debug log to see if subscription fires
             if (state.isConnected) {
                 const walletProvider = modal.getWalletProvider();
                 if (walletProvider) {
@@ -151,6 +149,7 @@
 
         async function connectWallet() {
             try {
+                console.log('Opening modal...'); // Debug log to confirm button click
                 await modal.open();
             } catch (error) {
                 console.error('Wallet connection failed:', error);
